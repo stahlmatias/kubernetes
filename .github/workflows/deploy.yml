@@ -18,7 +18,7 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       - name: Save DigitalOcean kubeconfig
-        run: doctl kubernetes cluster kubeconfig save <TU_CLUSTER_NAME>
+        run: doctl kubernetes cluster kubeconfig save do-sfo3-k8s-1-33-1-do-3-sfo3-1755792834306
 
       - name: Deploy to cluster
         run: |
