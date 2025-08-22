@@ -1,0 +1,31 @@
+# .github/workflows/deploy.yml
+name: Deploy to DigitalOcean K8s
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Execute manually
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Save DigitalOcean kubeconfig
+        run: doctl kubernetes cluster kubeconfig save <TU_CLUSTER_NAME>
+
+      - name: Deploy to cluster
+        run: |
+          kubectl apply -f k8s-manifests/
+          kubectl rollout status deployment/web-app --timeout=60s || echo "Deployment failed as expected"
+
+      - name: Show pod status for troubleshooting
+        run: |
+          kubectl get pods -o wide
+          kubectl get events --sort-by=.metadata.creationTimestamp | tail -10
